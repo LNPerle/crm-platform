@@ -17,7 +17,8 @@
 
 create extension if not exists "pgcrypto";
 
-create extension if not exists "unaccent";
+create extension if not exists unaccent
+    with schema public;
 
 -- ==========================================================
 -- Profiles
@@ -158,14 +159,29 @@ create table public.businesses (
             )
         ),
 
+    updated_at timestamptz
+        not null
+        default now(),
+
+    deleted_at timestamptz,
+
     is_demo boolean
-    not null
-    default false,
+        not null
+        default false,
 
     locale text
-    not null
-    default 'fr'
+        not null
+        default 'fr',
 
+    constraint businesses_subscription_status_check
+        check (
+            subscription_status in (
+                'trial',
+                'active',
+                'cancelled',
+                'expired'
+            )
+        )
 );
 
 comment on table public.businesses is
@@ -537,9 +553,6 @@ create table public.customers (
 comment on table public.customers is
 'Clients appartenant à un commerce.';
 
-comment on column public.customers.completed_cycles is
-'Nombre total de récompenses obtenues par le client.';
-
 comment on column public.customers.favorite is
 'Permet de mettre un client en favori.';
 
@@ -623,6 +636,10 @@ create table public.customer_loyalty_accounts (
 
 comment on table public.customer_loyalty_accounts is
 'Progression des clients dans chaque programme de fidélité.';
+
+comment on column
+    public.customer_loyalty_accounts.completed_cycles is
+'Nombre de cycles de fidélité terminés par le client dans ce programme.';
 
 -- ==========================================================
 -- Visits
@@ -877,4 +894,36 @@ create table public.customer_tags (
 comment on table public.customer_tags is
 'Tags personnalisés des clients.';
 
-create extension if not exists unaccent;
+
+-- ==========================================================
+-- Customer Tag Assignments
+--
+-- Relation plusieurs-à-plusieurs entre les clients
+-- et les tags d'un commerce.
+-- ==========================================================
+
+create table public.customer_tag_assignments (
+
+    customer_id uuid
+        not null
+        references public.customers(id)
+        on delete cascade,
+
+    tag_id uuid
+        not null
+        references public.customer_tags(id)
+        on delete cascade,
+
+    created_at timestamptz
+        not null
+        default now(),
+
+    primary key (
+        customer_id,
+        tag_id
+    )
+
+);
+
+comment on table public.customer_tag_assignments is
+'Association entre les clients et leurs tags.';
