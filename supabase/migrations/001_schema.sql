@@ -164,7 +164,7 @@ create table public.businesses (
 
     locale text
     not null
-    default 'fr',
+    default 'fr'
 
 );
 
