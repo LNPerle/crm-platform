@@ -13,18 +13,29 @@ on:
 
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   database-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Récupérer le projet
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Installer Supabase CLI
-        uses: supabase/setup-cli@v1
+        uses: supabase/setup-cli@v2
         with:
           version: latest
+          github-token: ${{ github.token }}
+
+      - name: Afficher les versions
+        run: |
+          node --version
+          docker --version
+          supabase --version
 
       - name: Démarrer la base Supabase
         run: supabase db start
@@ -38,3 +49,7 @@ jobs:
 
       - name: Exécuter les tests pgTAP
         run: supabase test db
+
+      - name: Arrêter Supabase
+        if: always()
+        run: supabase stop --no-backup || true
