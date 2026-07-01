@@ -1,0 +1,40 @@
+name: Database tests
+
+on:
+  push:
+    paths:
+      - "supabase/**"
+      - ".github/workflows/database-tests.yml"
+
+  pull_request:
+    paths:
+      - "supabase/**"
+      - ".github/workflows/database-tests.yml"
+
+  workflow_dispatch:
+
+jobs:
+  database-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupérer le projet
+        uses: actions/checkout@v4
+
+      - name: Installer Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Démarrer la base Supabase
+        run: supabase db start
+
+      - name: Vérifier les fonctions PostgreSQL
+        run: |
+          supabase db lint \
+            --local \
+            --level error \
+            --fail-on error
+
+      - name: Exécuter les tests pgTAP
+        run: supabase test db

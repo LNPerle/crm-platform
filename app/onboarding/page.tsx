@@ -1,3 +1,4 @@
+import { createBusiness } from "./actions";
 export default function OnboardingPage() {
   return (
     <main className="min-h-screen bg-slate-50 flex items-center justify-center px-6">
@@ -11,7 +12,7 @@ export default function OnboardingPage() {
           Commençons par créer votre commerce.
         </p>
 
-        <form className="mt-10 space-y-6">
+        <form action={createBusiness} className="mt-10 space-y-6">
 
           <div>
             <label className="block text-sm font-medium mb-2">
@@ -19,6 +20,7 @@ export default function OnboardingPage() {
             </label>
 
             <input
+              name="name"
               type="text"
               placeholder="Ex : Escale à Saigon"
               className="w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -31,6 +33,7 @@ export default function OnboardingPage() {
             </label>
 
             <select
+              name="industry"
               className="w-full rounded-xl border border-slate-300 px-4 py-3"
             >
               <option>Restaurant</option>
