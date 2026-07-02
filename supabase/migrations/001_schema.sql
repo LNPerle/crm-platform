@@ -158,30 +158,6 @@ create table public.businesses (
                 'expired'
             )
         ),
-
-    updated_at timestamptz
-        not null
-        default now(),
-
-    deleted_at timestamptz,
-
-    is_demo boolean
-        not null
-        default false,
-
-    locale text
-        not null
-        default 'fr',
-
-    constraint businesses_subscription_status_check
-        check (
-            subscription_status in (
-                'trial',
-                'active',
-                'cancelled',
-                'expired'
-            )
-        )
 );
 
 comment on table public.businesses is
